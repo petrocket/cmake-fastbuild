@@ -1251,7 +1251,7 @@ void cmGlobalFastbuildGenerator::WriteTargets(std::ostream& os)
             for (const auto& file : files)
               ProjectFiles.push_back(file);
           } else {
-            std::string folderId = folder;
+            std::string folderId = "folder_" + folder;
             cmSystemTools::ReplaceString(folderId, ":", "_");
             cmSystemTools::ReplaceString(folderId, " ", "_");
             cmSystemTools::ReplaceString(folderId, "/", "_");
@@ -1306,7 +1306,9 @@ void cmGlobalFastbuildGenerator::WriteTargets(std::ostream& os)
                       Quote(VCXProject.ProjectRebuildCommand), 3);
         Indent(ss, 2);
         ss << "]";
-        WriteVariable(*BuildFileStream, "ProjectConfigs", "[\n" + ss.str(), 2);
+        WriteVariable(*BuildFileStream, "ProjectConfig", "[\n" + ss.str(), 2);
+        WriteArray(*BuildFileStream, "ProjectConfigs",
+                     { ".ProjectConfig" }, 2);
       }
       Indent(*BuildFileStream, 1);
       *BuildFileStream << "}\n";
@@ -1356,7 +1358,7 @@ void cmGlobalFastbuildGenerator::WriteTargets(std::ostream& os)
       if (folder.empty())
         continue;
 
-      std::string folderId = folder;
+      std::string folderId = "folder_" + folder;
       cmSystemTools::ReplaceString(folderId, " ", "_");
       cmSystemTools::ReplaceString(folderId, "/", "_");
       cmSystemTools::ReplaceString(folderId, "\\", "_");
@@ -1380,6 +1382,7 @@ void cmGlobalFastbuildGenerator::WriteTargets(std::ostream& os)
       std::string depsId = project + "_deps";
 
       cmSystemTools::ReplaceString(depsId, "-", "_");
+      cmSystemTools::ReplaceString(depsId, ".", "_");
 
       std::stringstream ss;
       WriteArray(ss, "Projects", Wrap(std::vector<std::string>{ project }), 2);
