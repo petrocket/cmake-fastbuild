@@ -1225,7 +1225,7 @@ void cmFastbuildNormalTargetGenerator::Generate()
     cmSourceGroup* sourceGroup = this->Makefile->FindSourceGroup(
       source.Value->ResolveFullPath(), sourceGroups);
     VCXProject.ProjectFiles[sourceGroup->GetFullName()].push_back(
-      ConvertToFastbuildPath(source.Value->GetFullPath()));
+      source.Value->GetFullPath());
   }
   std::string cmakeCommand = this->GetLocalGenerator()->ConvertToOutputFormat(
     cmSystemTools::GetCMakeCommand(), cmLocalGenerator::SHELL);

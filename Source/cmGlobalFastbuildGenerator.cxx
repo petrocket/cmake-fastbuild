@@ -1244,38 +1244,17 @@ void cmGlobalFastbuildGenerator::WriteTargets(std::ostream& os)
       {
         WriteVariable(*BuildFileStream, "ProjectOutput",
                       Quote(VCXProject.ProjectOutput), 2);
+        WriteVariable(*BuildFileStream, "ProjectBasePath",
+                      Quote(cmStrCat(LocalGenerators[0]->GetSourceDirectory(), "/", VCXProject.Folder)), 2);
+        
 
         std::vector<std::string> ProjectFiles, ProjectFilesWithFolders;
         for (const auto& [folder, files] : VCXProject.ProjectFiles) {
-          if (folder.empty()) {
-            for (const auto& file : files)
-              ProjectFiles.push_back(file);
-          } else {
-            std::string folderId = "folder_" + folder;
-            cmSystemTools::ReplaceString(folderId, ":", "_");
-            cmSystemTools::ReplaceString(folderId, " ", "_");
-            cmSystemTools::ReplaceString(folderId, "/", "_");
-            cmSystemTools::ReplaceString(folderId, "\\", "_");
-            cmSystemTools::ReplaceString(folderId, "..", "_");
-            cmSystemTools::ReplaceString(folderId, ".", "_");
-            cmSystemTools::ReplaceString(folderId, "+", "_");
-            cmSystemTools::ReplaceString(folderId, "-", "_");
-
-            std::stringstream ss;
-            WriteVariable(ss, "Folder", Quote(folder), 3);
-            WriteArray(ss, "Files", Wrap(files), 3);
-            Indent(ss, 2);
-            ss << "]";
-            WriteVariable(*BuildFileStream, folderId, "[\n" + ss.str(), 2);
-
-            ProjectFilesWithFolders.push_back("." + folderId);
-          }
+        for (const auto& file : files)
+          ProjectFiles.push_back(file);
         }
         if (!ProjectFiles.empty())
           WriteArray(*BuildFileStream, "ProjectFiles", Wrap(ProjectFiles), 2);
-        if (!ProjectFilesWithFolders.empty())
-          WriteArray(*BuildFileStream, "ProjectFilesWithFolders",
-                     ProjectFilesWithFolders, 2);
 
         if (!VCXProject.UserProps.empty()) {
           std::stringstream ss;
